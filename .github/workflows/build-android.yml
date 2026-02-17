@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,23 +22,36 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
-    - name: Setup EAS CLI
-      run: npm install -g eas-cli
+    - name: Install dependencies
+      run: npm ci
       
-    - name: Setup EAS
-      run: eas build:configure --non-interactive
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'gradle'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Prebuild Android project
+      run: npx expo prebuild --platform android --clean
       env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      
+        EXPO_NO_DOCTOR: 1
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x android/gradlew
+    
     - name: Build APK
-      run: eas build --platform android --profile production --non-interactive
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      
+      run: |
+        cd android
+        ./gradlew assembleRelease --no-daemon
+    
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: fangkuai-apk
         path: |
-          **/*.apk
+          android/app/build/outputs/apk/release/*.apk
         retention-days: 30
