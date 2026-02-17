@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__web-reader__webReader",
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(dir:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npm install:*)",
+      "Bash(del:*)",
+      "Bash(npm start)",
+      "Bash(npx expo start:*)",
+      "Bash(EXPO_NO_DOTENV=1 npx expo start:*)",
+      "Bash(npx eas build:configure:*)",
+      "Bash(npx expo build:android:*)",
+      "Bash(node:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(npm run:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
+    ]
+  }
+}

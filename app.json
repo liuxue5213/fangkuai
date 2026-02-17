@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "超级方块",
+    "slug": "super-block-game",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1e1e2f"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.superblock.game"
+    },
+    "android": {
+      "package": "com.superblock.game",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1e1e2f"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    }
+  }
+}
