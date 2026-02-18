@@ -181,11 +181,15 @@ export const eliminateMatches = (state: GameState): GameState => {
   }
 
   console.log('Found matches:', matches.length, 'groups');
+  
+  // 详细打印每个匹配组
   for (let i = 0; i < matches.length; i++) {
     const match = matches[i];
     console.log(`Match group ${i + 1}:`, match.length, 'blocks, color:', match[0].colorIndex);
     if (match.length < 5) {
-      console.error(`ERROR: Match group ${i + 1} has only ${match.length} blocks but is being eliminated!`);
+      console.error(`❌ ERROR: Match group ${i + 1} has only ${match.length} blocks but is being eliminated!`);
+    } else {
+      console.log(`✅ Match group ${i + 1} is valid (>= 5 blocks)`);
     }
   }
 
@@ -209,7 +213,7 @@ export const eliminateMatches = (state: GameState): GameState => {
         count: match.length
       });
     } else {
-      console.error(`ERROR: Skipping match with ${match.length} blocks (less than 5)`);
+      console.error(`❌ ERROR: Skipping match with ${match.length} blocks (less than 5)`);
     }
   }
 

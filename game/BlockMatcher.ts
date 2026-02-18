@@ -71,6 +71,8 @@ export const findMatches = (board: Board): Block[][] => {
   const allMatches: Block[][] = [];
   const processedIds: Set<string> = new Set();
 
+  console.log('=== findMatches started ===');
+
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const block = board[row][col];
@@ -92,13 +94,16 @@ export const findMatches = (board: Board): Block[][] => {
 
       // 如果数量 >= 5，可消除
       if (connected.length >= MIN_MATCH) {
-        console.log(`Found match at (${row},${col}): ${connected.length} blocks, color index: ${block.colorIndex}`);
+        console.log(`✅ Found match at (${row},${col}): ${connected.length} blocks, color index: ${block.colorIndex}`);
         allMatches.push(connected);
+      } else {
+        console.log(`❌ Skipped group at (${row},${col}): ${connected.length} blocks (less than ${MIN_MATCH})`);
       }
     }
   }
 
   console.log(`Total matches found: ${allMatches.length}`);
+  console.log('=== findMatches complete ===');
   return allMatches;
 };
 
