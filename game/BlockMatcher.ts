@@ -5,66 +5,58 @@ import { Position } from '../types/Block';
 const BOARD_SIZE = 9;
 const MIN_MATCH = 5;
 
-// 8个方向
-const DIRECTIONS: Position[] = [
-  { row: -1, col: 0 },   // 上
-  { row: 1, col: 0 },    // 下
-  { row: 0, col: -1 },   // 左
-  { row: 0, col: 1 },    // 右
-  { row: -1, col: -1 }, // 左上
-  { row: -1, col: 1 },  // 右上
-  { row: 1, col: -1 },  // 左下
-  { row: 1, col: 1 },   // 右下
+// 4个直线方向（横向、纵向、对角线）
+const LINE_DIRECTIONS: Position[] = [
+  { row: 0, col: 1 },    // 横向右
+  { row: 1, col: 0 },    // 纵向下
+  { row: 1, col: 1 },    // 对角线右下
+  { row: 1, col: -1 },   // 对角线左下
 ];
 
-const findConnectedBlocks = (
+// 检查某个方向的直线匹配
+const findLineMatch = (
   board: Board,
-  startBlock: Block
+  startBlock: Block,
+  direction: Position
 ): Block[] => {
-  const connected: Block[] = [];
-  const visited: Set<string> = new Set();
-  const queue: Block[] = [startBlock];
-  visited.add(`${startBlock.row},${startBlock.col}`);
+  const line: Block[] = [startBlock];
+  const processedIds = new Set<string>([startBlock.id]);
 
-  console.log(`Starting search from (${startBlock.row},${startBlock.col}) with color ${startBlock.colorIndex}`);
+  // 向前搜索
+  let currentRow = startBlock.row;
+  let currentCol = startBlock.col;
 
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    connected.push(current);
+  while (true) {
+    currentRow += direction.row;
+    currentCol += direction.col;
 
-    for (const dir of DIRECTIONS) {
-      const newRow = current.row + dir.row;
-      const newCol = current.col + dir.col;
-      const key = `${newRow},${newCol}`;
-
-      // 检查边界
-      if (newRow < 0 || newRow >= BOARD_SIZE || newCol < 0 || newCol >= BOARD_SIZE) {
-        continue;
-      }
-
-      // 检查是否已访问
-      if (visited.has(key)) {
-        continue;
-      }
-
-      const neighborBlock = board[newRow][newCol];
-
-      // 检查是否为空
-      if (!neighborBlock) {
-        continue;
-      }
-
-      // 检查颜色是否相同
-      if (neighborBlock.colorIndex === startBlock.colorIndex) {
-        console.log(`  Found neighbor at (${newRow},${newCol}) with same color`);
-        visited.add(key);
-        queue.push(neighborBlock);
-      }
+    // 检查边界
+    if (currentRow < 0 || currentRow >= BOARD_SIZE || currentCol < 0 || currentCol >= BOARD_SIZE) {
+      break;
     }
+
+    const neighborBlock = board[currentRow][currentCol];
+
+    // 检查是否为空
+    if (!neighborBlock) {
+      break;
+    }
+
+    // 检查颜色是否相同
+    if (neighborBlock.colorIndex !== startBlock.colorIndex) {
+      break;
+    }
+
+    // 检查是否已处理
+    if (processedIds.has(neighborBlock.id)) {
+      break;
+    }
+
+    line.push(neighborBlock);
+    processedIds.add(neighborBlock.id);
   }
 
-  console.log(`Connected blocks found: ${connected.length}`);
-  return connected;
+  return line;
 };
 
 export const findMatches = (board: Board): Block[][] => {
@@ -86,18 +78,19 @@ export const findMatches = (board: Board): Block[][] => {
         continue;
       }
 
-      // 查找相连的同色方块
-      const connected = findConnectedBlocks(board, block);
+      // 检查4个直线方向
+      for (const direction of LINE_DIRECTIONS) {
+        const line = findLineMatch(board, block, direction);
 
-      // 标记已处理
-      connected.forEach(b => processedIds.add(b.id));
+        // 如果找到 >= 5 个，加入匹配
+        if (line.length >= MIN_MATCH) {
+          console.log(`✅ Found line match at (${row},${col}): ${line.length} blocks, color index: ${block.colorIndex}`);
+          allMatches.push(line);
 
-      // 如果数量 >= 5，可消除
-      if (connected.length >= MIN_MATCH) {
-        console.log(`✅ Found match at (${row},${col}): ${connected.length} blocks, color index: ${block.colorIndex}`);
-        allMatches.push(connected);
-      } else {
-        console.log(`❌ Skipped group at (${row},${col}): ${connected.length} blocks (less than ${MIN_MATCH})`);
+          // 标记所有方块为已处理
+          line.forEach(b => processedIds.add(b.id));
+          break; // 找到一个匹配就跳出，避免重复
+        }
       }
     }
   }
